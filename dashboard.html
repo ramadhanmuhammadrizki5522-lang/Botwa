@@ -1,0 +1,258 @@
+<!-- Tambahkan di sidebar -->
+<a href="#" onclick="showSection('features')" class="flex items-center space-x-3 px-4 py-3 rounded-lg" id="nav-features">
+    <i class="fas fa-star w-5"></i>
+    <span>Semua Fitur</span>
+</a>
+<a href="#" onclick="showSection('advanced')" class="flex items-center space-x-3 px-4 py-3 rounded-lg" id="nav-advanced">
+    <i class="fas fa-cogs w-5"></i>
+    <span>Fitur Advanced</span>
+</a>
+
+<!-- Section Fitur Lengkap -->
+<div id="featuresSection" class="hidden">
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">📋 Semua Fitur WABot Guard</h1>
+    
+    <div class="grid md:grid-cols-2 gap-6">
+        <!-- Keamanan -->
+        <div class="card p-6">
+            <h2 class="font-bold text-xl mb-4 text-green-600">🛡️ Fitur Keamanan</h2>
+            <div class="space-y-2">
+                <label class="flex items-center justify-between">
+                    <span>Anti Spam</span>
+                    <div class="toggle-switch" id="antiSpamToggle2"></div>
+                </label>
+                <label class="flex items-center justify-between">
+                    <span>Anti Link</span>
+                    <div class="toggle-switch" id="antiLinkToggle2"></div>
+                </label>
+                <label class="flex items-center justify-between">
+                    <span>Anti Toxic</span>
+                    <div class="toggle-switch" id="antiToxicToggle2"></div>
+                </label>
+                <label class="flex items-center justify-between">
+                    <span>Anti Virtex</span>
+                    <div class="toggle-switch" id="antiVirtexToggle"></div>
+                </label>
+                <label class="flex items-center justify-between">
+                    <span>Anti Sticker Spam</span>
+                    <div class="toggle-switch" id="antiStickerToggle"></div>
+                </label>
+                <label class="flex items-center justify-between">
+                    <span>Anti Mention All</span>
+                    <div class="toggle-switch" id="antiMentionToggle"></div>
+                </label>
+                <label class="flex items-center justify-between">
+                    <span>Anti Forward</span>
+                    <div class="toggle-switch" id="antiForwardToggle"></div>
+                </label>
+                <label class="flex items-center justify-between">
+                    <span>AI Moderation</span>
+                    <div class="toggle-switch" id="aiModerationToggle"></div>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Manajemen -->
+        <div class="card p-6">
+            <h2 class="font-bold text-xl mb-4 text-blue-600">👑 Fitur Manajemen</h2>
+            <div class="space-y-2">
+                <label class="flex items-center justify-between">
+                    <span>Auto Welcome</span>
+                    <div class="toggle-switch" id="welcomeToggle"></div>
+                </label>
+                <label class="flex items-center justify-between">
+                    <span>Auto Goodbye</span>
+                    <div class="toggle-switch" id="goodbyeToggle"></div>
+                </label>
+                <label class="flex items-center justify-between">
+                    <span>Slow Mode</span>
+                    <div class="toggle-switch" id="slowModeToggle"></div>
+                </label>
+                <label class="flex items-center justify-between">
+                    <span>Auto Warn System</span>
+                    <div class="toggle-switch" id="warnSystemToggle"></div>
+                </label>
+                <label class="flex items-center justify-between">
+                    <span>Auto Kick</span>
+                    <div class="toggle-switch" id="autoKickToggle"></div>
+                </label>
+                <label class="flex items-center justify-between">
+                    <span>Mute Timer</span>
+                    <div class="toggle-switch" id="muteTimerToggle"></div>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Interaktif -->
+        <div class="card p-6">
+            <h2 class="font-bold text-xl mb-4 text-yellow-600">🎮 Fitur Interaktif</h2>
+            <div class="space-y-3">
+                <button onclick="startQuiz()" class="w-full bg-purple-500 text-white py-2 rounded-lg">🎮 Mulai Quiz</button>
+                <button onclick="createPoll()" class="w-full bg-blue-500 text-white py-2 rounded-lg">📊 Buat Polling</button>
+                <button onclick="getRanking()" class="w-full bg-green-500 text-white py-2 rounded-lg">🏆 Lihat Ranking</button>
+                <button onclick="getSummary()" class="w-full bg-orange-500 text-white py-2 rounded-lg">📋 Ringkasan Chat</button>
+                <button onclick="lockGroup()" class="w-full bg-red-500 text-white py-2 rounded-lg">🔒 Lock Grup</button>
+                <button onclick="scheduleMessage()" class="w-full bg-teal-500 text-white py-2 rounded-lg">📅 Jadwalkan Pesan</button>
+            </div>
+        </div>
+        
+        <!-- Monitoring -->
+        <div class="card p-6">
+            <h2 class="font-bold text-xl mb-4 text-red-600">📊 Fitur Monitoring</h2>
+            <div class="space-y-3">
+                <div class="border-b pb-2">
+                    <p class="font-semibold">Total Pesan Hari Ini</p>
+                    <p id="todayMessages" class="text-2xl font-bold">0</p>
+                </div>
+                <div class="border-b pb-2">
+                    <p class="font-semibold">Spam Terblokir</p>
+                    <p id="totalSpamBlocked" class="text-2xl font-bold text-red-500">0</p>
+                </div>
+                <div class="border-b pb-2">
+                    <p class="font-semibold">Member Aktif</p>
+                    <p id="activeMembers" class="text-2xl font-bold text-green-500">0</p>
+                </div>
+                <button onclick="exportLogs()" class="w-full bg-gray-600 text-white py-2 rounded-lg">📥 Export Log (CSV)</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Fungsi untuk fitur interaktif
+async function startQuiz() {
+    const groupId = prompt('Masukkan ID Grup:');
+    if (!groupId) return;
+    
+    const response = await fetch('/api/bot/quiz/start', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ groupId })
+    });
+    const data = await response.json();
+    if (data.success) {
+        Swal.fire('Quiz Dimulai!', 'Anggota grup bisa menjawab dengan mengirim nomor jawaban', 'success');
+    }
+}
+
+async function createPoll() {
+    const groupId = prompt('Masukkan ID Grup:');
+    if (!groupId) return;
+    const question = prompt('Pertanyaan polling:');
+    const options = prompt('Opsi (pisah dengan koma):').split(',');
+    const duration = parseInt(prompt('Durasi (menit):', '5'));
+    
+    const response = await fetch('/api/bot/poll/create', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ groupId, question, options, duration })
+    });
+    const data = await response.json();
+    if (data.success) {
+        Swal.fire('Polling Dibuat!', 'Polling telah dikirim ke grup', 'success');
+    }
+}
+
+async function getRanking() {
+    const groupId = prompt('Masukkan ID Grup:');
+    if (!groupId) return;
+    const period = prompt('Periode (day/week/month):', 'day');
+    
+    const response = await fetch(`/api/bot/ranking/${groupId}?period=${period}`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+    const data = await response.json();
+    if (data.success) {
+        Swal.fire({
+            title: '🏆 Ranking Member',
+            html: `<pre style="text-align:left">${data.ranking}</pre>`,
+            width: '500px'
+        });
+    }
+}
+
+async function getSummary() {
+    const groupId = prompt('Masukkan ID Grup:');
+    if (!groupId) return;
+    const messageCount = parseInt(prompt('Jumlah pesan yang diringkas:', '100'));
+    
+    const response = await fetch('/api/bot/summary', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ groupId, messageCount })
+    });
+    const data = await response.json();
+    if (data.success) {
+        Swal.fire({
+            title: '📋 Ringkasan Chat',
+            html: `<pre style="text-align:left; white-space:pre-wrap">${data.summary}</pre>`,
+            width: '500px'
+        });
+    }
+}
+
+async function lockGroup() {
+    const groupId = prompt('Masukkan ID Grup:');
+    if (!groupId) return;
+    const duration = parseInt(prompt('Durasi lock (menit):', '60'));
+    
+    const response = await fetch('/api/bot/lock', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ groupId, duration })
+    });
+    const data = await response.json();
+    if (data.success) {
+        Swal.fire('Grup Dikunci!', `Grup akan read-only selama ${duration} menit`, 'success');
+    }
+}
+
+async function scheduleMessage() {
+    const groupId = prompt('Masukkan ID Grup:');
+    if (!groupId) return;
+    const message = prompt('Pesan yang akan dikirim:');
+    const time = prompt('Waktu (format: YYYY-MM-DD HH:MM:SS):');
+    
+    const response = await fetch('/api/bot/schedule', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ groupId, message, time })
+    });
+    const data = await response.json();
+    if (data.success) {
+        Swal.fire('Pesan Dijadwalkan!', `Pesan akan dikirim pada ${time}`, 'success');
+    }
+}
+
+async function exportLogs() {
+    const response = await fetch('/api/bot/logs/export', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+    const data = await response.json();
+    if (data.success) {
+        // Download CSV
+        const blob = new Blob([data.csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `wabot_logs_${new Date().toISOString()}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+}
+</script>

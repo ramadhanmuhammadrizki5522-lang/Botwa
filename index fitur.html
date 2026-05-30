@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WABot Guard - Super Complete Bot WhatsApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #075E54 0%, #128C7E 50%, #25D366 100%);
+            min-height: 100vh;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #075E54, #128C7E);
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(7,94,84,0.3);
+        }
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #075E54, #128C7E);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+        }
+        .nav-link {
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: linear-gradient(135deg, #075E54, #128C7E);
+            color: white;
+        }
+        .toggle-switch {
+            width: 50px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .toggle-switch.active {
+            background: #25D366;
+        }
+        .toggle-switch::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            transition: 0.3s;
+        }
+        .toggle-switch.active::after {
+            left: 27px;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-online { background: #d1fae5; color: #059669; }
+        .status-offline { background: #fee2e2; color: #dc2626; }
+        .status-warning { background: #fef3c7; color: #d97706; }
+        .menu-card {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .menu-card:hover {
+            transform: translateX(5px);
+            background: #f0fdf4;
+        }
+        .qr-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #25D366;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #075E54, #25D366);
+            transition: width 0.5s;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #128C7E; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <i class="fab fa-whatsapp text-green-500 text-2xl"></i>
+                    <span class="font-bold text-xl bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">WABot Guard</span>
+                    <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">v3.0 - 60+ Fitur</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="userGreeting" class="hidden md:flex items-center space-x-2 text-gray-600">
+                        <i class="fas fa-user-circle text-2xl text-green-600"></i>
+                        <span id="userName" class="text-sm font-medium"></span>
+                    </div>
+                    <button id="loginBtn" class="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition">
+                        <i class="fas fa-key mr-1"></i>Login
+                    </button>
+                    <button id="dashboardBtn" class="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition hidden">
+                        <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
+                    </button>
+                    <button id="logoutBtn" class="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-red-600 transition hidden">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="text-center mb-12">
+            <i class="fab fa-whatsapp text-7xl text-white mb-4 animate-pulse"></i>
+            <h1 class="text-5xl font-bold text-white mb-4">WABot Guard <span class="text-yellow-300">Super Complete</span></h1>
+            <p class="text-xl text-white opacity-90">Bot WhatsApp dengan 60+ Fitur Lengkap | Anti Spam | Anti Link | Anti Toxic | Auto Reply | Quiz | Poll | Dan Masih Banyak Lagi!</p>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+            <div class="glass-card p-4 text-center">
+                <i class="fas fa-shield-alt text-green-600 text-2xl mb-2"></i>
+                <div class="text-2xl font-bold text-gray-800">15</div>
+                <div class="text-xs text-gray-500">Fitur Keamanan</div>
+            </div>
+            <div class="glass-card p-4 text-center">
+                <i class="fas fa-crown text-green-600 text-2xl mb-2"></i>
+                <div class="text-2xl font-bold text-gray-800">12</div>
+                <div class="text-xs text-gray-500">Fitur Manajemen</div>
+            </div>
+            <div class="glass-card p-4 text-center">
+                <i class="fas fa-gamepad text-green-600 text-2xl mb-2"></i>
+                <div class="text-2xl font-bold text-gray-800">10</div>
+                <div class="text-xs text-gray-500">Fitur Interaktif</div>
+            </div>
+            <div class="glass-card p-4 text-center">
+                <i class="fas fa-chart-line text-green-600 text-2xl mb-2"></i>
+                <div class="text-2xl font-bold text-gray-800">23</div>
+                <div class="text-xs text-gray-500">Fitur Lainnya</div>
+            </div>
+        </div>
+
+        <!-- Main Menu Grid - 60 FITUR -->
+        <div class="glass-card p-6 mb-8">
+            <h2 class="text-2xl font-bold text-center mb-6">📋 SEMUA MENU FITUR (60+ Fitur)</h2>
+            
+            <!-- Kategori Menu -->
+            <div class="grid md:grid-cols-5 gap-2 mb-6">
+                <button onclick="filterMenu('all')" class="filter-btn active bg-green-600 text-white px-3 py-2 rounded-lg text-sm">Semua</button>
+                <button onclick="filterMenu('security')" class="filter-btn bg-gray-200 px-3 py-2 rounded-lg text-sm">🛡️ Keamanan</button>
+                <button onclick="filterMenu('management')" class="filter-btn bg-gray-200 px-3 py-2 rounded-lg text-sm">👑 Manajemen</button>
+                <button onclick="filterMenu('interactive')" class="filter-btn bg-gray-200 px-3 py-2 rounded-lg text-sm">🎮 Interaktif</button>
+                <button onclick="filterMenu('monitoring')" class="filter-btn bg-gray-200 px-3 py-2 rounded-lg text-sm">📊 Monitoring</button>
+            </div>
+            
+            <div id="menuGrid" class="grid md:grid-cols-3 gap-3">
+                <!-- Menu akan di-load via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Cara Kerja -->
+        <div class="glass-card p-6 mb-8">
+            <h2 class="text-2xl font-bold text-center mb-6">🚀 Cara Menggunakan</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-green-600 text-2xl font-bold">1</span>
+                    </div>
+                    <h3 class="font-bold mb-2">Register / Login</h3>
+                    <p class="text-gray-600 text-sm">Buat akun atau login dengan akun yang sudah ada</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-green-600 text-2xl font-bold">2</span>
+                    </div>
+                    <h3 class="font-bold mb-2">Scan QR Code</h3>
+                    <p class="text-gray-600 text-sm">Scan QR dengan WhatsApp untuk menghubungkan bot</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span class="text-green-600 text-2xl font-bold">3</span>
+                    </div>
+                    <h3 class="font-bold mb-2">Aktifkan Fitur</h3>
+                    <p class="text-gray-600 text-sm">Pilih grup dan aktifkan fitur yang diinginkan</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Login</h2>
+                <button onclick="closeLoginModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Email / Username</label>
+                    <input type="text" id="loginUsername" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Password</label>
+                    <input type="password" id="loginPassword" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Login
+                </button>
+            </form>
+            <p class="text-center text-gray-600 mt-4">Belum punya akun? <a href="#" onclick="showRegister()" class="text-green-600">Daftar</a></p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Daftar Akun</h2>
+                <button onclick="closeRegisterModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <form id="registerForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Nama Lengkap</label>
+                    <input type="text" id="regName" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Email</label>
+                    <input type="email" id="regEmail" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Username</label>
+                    <input type="text" id="regUsername" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Password</label>
+                    <input type="password" id="regPassword" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition">
+                    <i class="fas fa-user-plus mr-2"></i>Daftar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Data Menu - 60+ FITUR LENGKAP
+        const menus = {
+            security: [
+                { name: "Anti Spam", icon: "🛡️", desc: "Blokir pesan berulang/duplikat", category: "security", enabled: true },
+                { name: "Anti Link", icon: "🔗", desc: "Blokir link promosi/iklan", category: "security", enabled: true },
+                { name: "Anti Toxic", icon: "😤", desc: "Filter kata kasar & toxic", category: "security", enabled: true },
+                { name: "Anti Phishing", icon: "🎣", desc: "Deteksi link mencurigakan", category: "security", enabled: false },
+                { name: "Anti Bot", icon: "🤖", desc: "Deteksi & kick akun bot", category: "security", enabled: false },
+                { name: "Anti Virtex", icon: "💣", desc: "Blokir pesan panjang/aneh", category: "security", enabled: true },
+                { name: "Anti Sticker Spam", icon: "🎨", desc: "Batasi kiriman stiker", category: "security", enabled: true },
+                { name: "Anti Media Spam", icon: "📷", desc: "Batasi gambar/video", category: "security", enabled: false },
+                { name: "Anti Mention All", icon: "📢", desc: "Blokir @all/@everyone", category: "security", enabled: true },
+                { name: "Anti Forward", icon: "🔄", desc: "Blokir forward berlebihan", category: "security", enabled: true },
+                { name: "NSFW Filter", icon: "🔞", desc: "Blokir konten dewasa", category: "security", enabled: false },
+                { name: "Scam Detection", icon: "⚠️", desc: "Deteksi pola penipuan", category: "security", enabled: false },
+                { name: "Anti Spam Link", icon: "🚫", desc: "Blokir spam berantai", category: "security", enabled: false },
+                { name: "Anti Fake Admin", icon: "👑", desc: "Deteksi admin palsu", category: "security", enabled: false },
+                { name: "Anti Call", icon: "📞", desc: "Blokir panggilan suara", category: "security", enabled: false }
+            ],
+            management: [
+                { name: "Auto Welcome", icon: "👋", desc: "Sambut anggota baru", category: "management", enabled: true },
+                { name: "Auto Goodbye", icon: "👋", desc: "Ucapkan selamat tinggal", category: "management", enabled: false },
+                { name: "Auto Kick", icon: "🔨", desc: "Kick otomatis", category: "management", enabled: false },
+                { name: "Auto Warn", icon: "⚠️", desc: "Peringatan sebelum kick", category: "management", enabled: true },
+                { name: "Mute Timer", icon: "🔇", desc: "Mute sementara", category: "management", enabled: false },
+                { name: "Schedule Message", icon: "📅", desc: "Jadwalkan pesan", category: "management", enabled: true },
+                { name: "Auto Delete", icon: "🗑️", desc: "Hapus pesan otomatis", category: "management", enabled: false },
+                { name: "Slow Mode", icon: "🐢", desc: "Batasi jeda pesan", category: "management", enabled: true },
+                { name: "Lock Group", icon: "🔒", desc: "Kunci grup sementara", category: "management", enabled: true },
+                { name: "Member Limit", icon: "📊", desc: "Batasi jumlah anggota", category: "management", enabled: false },
+                { name: "Auto Promote", icon: "⬆️", desc: "Promosi otomatis", category: "management", enabled: false },
+                { name: "Auto Demote", icon: "⬇️", desc: "Turunkan jabatan", category: "management", enabled: false }
+            ],
+            interactive: [
+                { name: "Auto Reply", icon: "🤖", desc: "Balas otomatis per kata", category: "interactive", enabled: true },
+                { name: "Custom Command", icon: "⚡", desc: "Buat perintah kustom", category: "interactive", enabled: true },
+                { name: "Quiz Game", icon: "🎮", desc: "Quiz interaktif", category: "interactive", enabled: true },
+                { name: "Trivia", icon: "❓", desc: "Pertanyaan umum", category: "interactive", enabled: false },
+                { name: "Poll Maker", icon: "📊", desc: "Buat polling/voting", category: "interactive", enabled: true },
+                { name: "Random Number", icon: "🎲", desc: "Generate angka random", category: "interactive", enabled: false },
+                { name: "Dice Roll", icon: "🎲", desc: "Lempar dadu", category: "interactive", enabled: false },
+                { name: "Joke Generator", icon: "😄", desc: "Kirim jokes random", category: "interactive", enabled: false },
+                { name: "Quote of Day", icon: "📖", desc: "Kutipan motivasi", category: "interactive", enabled: false },
+                { name: "Prayer Times", icon: "🕌", desc: "Jadwal sholat", category: "interactive", enabled: false }
+            ],
+            monitoring: [
+                { name: "Aktivitas Harian", icon: "📈", desc: "Grafik aktivitas", category: "monitoring", enabled: true },
+                { name: "Member Ranking", icon: "🏆", desc: "Peringkat aktif", category: "monitoring", enabled: true },
+                { name: "Top Spammer", icon: "🐌", desc: "Deteksi spammer", category: "monitoring", enabled: false },
+                { name: "Jam Sibuk", icon: "⏰", desc: "Analisis waktu ramai", category: "monitoring", enabled: false },
+                { name: "Laporan Mingguan", icon: "📋", desc: "Report otomatis", category: "monitoring", enabled: false },
+                { name: "Export Log", icon: "📥", desc: "Download log CSV", category: "monitoring", enabled: true },
+                { name: "Real-time Dashboard", icon: "📺", desc: "Monitoring live", category: "monitoring", enabled: true },
+                { name: "Sentiment Analysis", icon: "😊", desc: "Analisis sentimen", category: "monitoring", enabled: false }
+            ],
+            ai: [
+                { name: "AI Moderation", icon: "🧠", desc: "Deteksi toxic dengan AI", category: "ai", enabled: false },
+                { name: "Auto Summary", icon: "📝", desc: "Rangkuman chat", category: "ai", enabled: true },
+                { name: "Language Detection", icon: "🌐", desc: "Deteksi bahasa asing", category: "ai", enabled: false },
+                { name: "Translate", icon: "🔄", desc: "Terjemahan otomatis", category: "ai", enabled: false },
+                { name: "Auto Responder", icon: "💬", desc: "Respons cerdas AI", category: "ai", enabled: false }
+            ],
+            admin: [
+                { name: "Multi Admin", icon: "👥", desc: "Beberapa admin", category: "admin", enabled: false },
+                { name: "Whitelist User", icon: "✅", desc: "User bebas aturan", category: "admin", enabled: false },
+                { name: "Blacklist User", icon: "🚫", desc: "Blokir user global", category: "admin", enabled: false },
+                { name: "Backup & Restore", icon: "💾", desc: "Backup konfigurasi", category: "admin", enabled: false },
+                { name: "Multiple Group", icon: "👥", desc: "Kelola banyak grup", category: "admin", enabled: true },
+                { name: "API Access", icon: "🔌", desc: "Integrasi API", category: "admin", enabled: false },
+                { name: "Webhook", icon: "🌐", desc: "Webhook notifikasi", category: "admin", enabled: false },
+                { name: "Logs Viewer", icon: "📜", desc: "Lihat semua log", category: "admin", enabled: true }
+            ],
+            other: [
+                { name: "Sticker Maker", icon: "🎨", desc: "Buat stiker dari gambar", category: "other", enabled: false },
+                { name: "Media Saver", icon: "💾", desc: "Simpan media otomatis", category: "other", enabled: false },
+                { name: "Music Player", icon: "🎵", desc: "Putar musik di grup", category: "other", enabled: false },
+                { name: "Voice to Text", icon: "🎤", desc: "Ubah suara ke teks", category: "other", enabled: false },
+                { name: "Text to Voice", icon: "🔊", desc: "Ubah teks ke suara", category: "other", enabled: false }
+            ]
+        };
+
+        // Gabungkan semua menu
+        let allMenus = [];
+        Object.keys(menus).forEach(cat => {
+            allMenus = allMenus.concat(menus[cat]);
+        });
+
+        function renderMenus(category = 'all') {
+            const container = document.getElementById('menuGrid');
+            let filteredMenus = allMenus;
+            if (category !== 'all') {
+                filteredMenus = allMenus.filter(m => m.category === category);
+            }
+            
+            container.innerHTML = filteredMenus.map(menu => `
+                <div class="menu-card flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-green-50 transition">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl">${menu.icon}</span>
+                        <div>
+                            <div class="font-semibold text-sm">${menu.name}</div>
+                            <div class="text-xs text-gray-500">${menu.desc}</div>
+                        </div>
+                    </div>
+                    <div class="toggle-switch ${menu.enabled ? 'active' : ''}" data-menu="${menu.name}" onclick="toggleMenuStatus(this)"></div>
+                </div>
+            `).join('');
+        }
+
+        function filterMenu(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-green-600', 'text-white');
+                btn.classList.add('bg-gray-200');
+            });
+            event.target.classList.add('bg-green-600', 'text-white');
+            event.target.classList.remove('bg-gray-200');
+            renderMenus(category);
+        }
+
+        function toggleMenuStatus(element) {
+            element.classList.toggle('active');
+            const menuName = element.getAttribute('data-menu');
+            Swal.fire({
+                icon: 'success',
+                title: `${menuName} ${element.classList.contains('active') ? 'Diaktifkan' : 'Dinonaktifkan'}`,
+                text: `Pengaturan akan disimpan otomatis`,
+                toast: true,
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+
+        // Auth functions
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            const loginBtn = document.getElementById('loginBtn');
+            const dashboardBtn = document.getElementById('dashboardBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const userGreeting = document.getElementById('userGreeting');
+            const userName = document.getElementById('userName');
+            
+            if (token && user) {
+                const userData = JSON.parse(user);
+                loginBtn.classList.add('hidden');
+                dashboardBtn.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
+                userGreeting.classList.remove('hidden');
+                userName.innerText = userData.name || userData.username;
+                dashboardBtn.onclick = () => window.location.href = '/dashboard.html';
+            } else {
+                loginBtn.classList.remove('hidden');
+                dashboardBtn.classList.add('hidden');
+                logoutBtn.classList.add('hidden');
+                userGreeting.classList.add('hidden');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    Swal.fire('Berhasil!', 'Login sukses', 'success').then(() => {
+                        window.location.href = '/dashboard.html';
+                    });
+                } else {
+                    Swal.fire('Gagal!', data.message, 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error!', 'Terjadi kesalahan', 'error');
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, username, password })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    Swal.fire('Berhasil!', 'Registrasi sukses, silakan login', 'success').then(() => {
+                        closeRegisterModal();
+                        showLoginModal();
+                    });
+                } else {
+                    Swal.fire('Gagal!', data.message, 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error!', 'Terjadi kesalahan', 'error');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            Swal.fire('Logout', 'Anda telah logout', 'success').then(() => {
+                window.location.reload();
+            });
+        }
+
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('active');
+        }
+
+        function showRegister() {
+            closeLoginModal();
+            document.getElementById('registerModal').classList.add('active');
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('registerModal').classList.remove('active');
+        }
+
+        document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
+        document.getElementById('registerForm')?.addEventListener('submit', handleRegister);
+        document.getElementById('loginBtn')?.addEventListener('click', showLoginModal);
+        document.getElementById('logoutBtn')?.addEventListener('click', logout);
+
+        // Initialize
+        renderMenus('all');
+        checkAuth();
+    </script>
+</body>
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - WABot Guard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background: #f0f2f5; }
+        .sidebar {
+            background: #075E54;
+            color: white;
+        }
+        .sidebar a {
+            transition: all 0.3s;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background: #128C7E;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .status-online { background: #25D366; }
+        .status-offline { background: #dc3545; }
+        .qr-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .toggle-switch {
+            width: 50px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .toggle-switch.active {
+            background: #25D366;
+        }
+        .toggle-switch::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            transition: 0.3s;
+        }
+        .toggle-switch.active::after {
+            left: 27px;
+        }
+    </style>
+</head>
+<body>
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="sidebar w-72 fixed h-full">
+            <div class="p-6">
+                <div class="flex items-center space-x-3 mb-8">
+                    <i class="fab fa-whatsapp text-2xl"></i>
+                    <span class="font-bold text-xl">WABot Guard</span>
+                </div>
+                
+                <nav class="space-y-2">
+                    <a href="#" onclick="showSection('overview')" class="flex items-center space-x-3 px-4 py-3 rounded-lg" id="nav-overview">
+                        <i class="fas fa-tachometer-alt w-5"></i>
+                        <span>Overview</span>
+                    </a>
+                    <a href="#" onclick="showSection('bot')" class="flex items-center space-x-3 px-4 py-3 rounded-lg" id="nav-bot">
+                        <i class="fab fa-whatsapp w-5"></i>
+                        <span>Bot WhatsApp</span>
+                    </a>
+                    <a href="#" onclick="showSection('groups')" class="flex items-center space-x-3 px-4 py-3 rounded-lg" id="nav-groups">
+                        <i class="fas fa-users w-5"></i>
+                        <span>Grup Terjaga</span>
+                    </a>
+                    <a href="#" onclick="showSection('settings')" class="flex items-center space-x-3 px-4 py-3 rounded-lg" id="nav-settings">
+                        <i class="fas fa-sliders-h w-5"></i>
+                        <span>Pengaturan</span>
+                    </a>
+                    <a href="#" onclick="showSection('logs')" class="flex items-center space-x-3 px-4 py-3 rounded-lg" id="nav-logs">
+                        <i class="fas fa-history w-5"></i>
+                        <span>Log Aktivitas</span>
+                    </a>
+                </nav>
+                
+                <div class="absolute bottom-6 left-6 right-6">
+                    <button onclick="logout()" class="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="ml-72 flex-1 p-8 overflow-y-auto">
+            <!-- Overview Section -->
+            <div id="overviewSection">
+                <h1 class="text-3xl font-bold text-gray-800 mb-8">Dashboard Overview</h1>
+                
+                <!-- Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="card p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Total Grup</p>
+                                <p id="totalGroups" class="text-3xl font-bold text-gray-800">0</p>
+                            </div>
+                            <i class="fas fa-users text-3xl text-green-500 opacity-50"></i>
+                        </div>
+                    </div>
+                    <div class="card p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Pesan Diproses</p>
+                                <p id="totalMessages" class="text-3xl font-bold text-gray-800">0</p>
+                            </div>
+                            <i class="fas fa-comment-dots text-3xl text-blue-500 opacity-50"></i>
+                        </div>
+                    </div>
+                    <div class="card p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Spam Terblokir</p>
+                                <p id="totalBlocked" class="text-3xl font-bold text-gray-800">0</p>
+                            </div>
+                            <i class="fas fa-shield-alt text-3xl text-red-500 opacity-50"></i>
+                        </div>
+                    </div>
+                    <div class="card p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Status Bot</p>
+                                <p id="botStatus" class="text-xl font-bold text-green-500">● Online</p>
+                            </div>
+                            <i class="fab fa-whatsapp text-3xl text-green-500 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="card p-6 mb-8">
+                    <h2 class="font-bold text-xl mb-4">Statistik Aktivitas (7 Hari Terakhir)</h2>
+                    <canvas id="activityChart" height="100"></canvas>
+                </div>
+            </div>
+
+            <!-- Bot Section -->
+            <div id="botSection" class="hidden">
+                <h1 class="text-3xl font-bold text-gray-800 mb-8">Bot WhatsApp</h1>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- QR Code Scanner -->
+                    <div class="card p-6">
+                        <h2 class="font-bold text-xl mb-4">Scan QR Code</h2>
+                        <p class="text-gray-600 text-sm mb-4">Scan QR ini dengan WhatsApp Anda untuk menghubungkan bot</p>
+                        <div id="qrContainer" class="qr-container flex justify-center">
+                            <div class="text-center">
+                                <div class="loader border-4 border-gray-200 border-t-green-500 rounded-full w-16 h-16 animate-spin mx-auto mb-4"></div>
+                                <p>Menunggu QR Code...</p>
+                            </div>
+                        </div>
+                        <button onclick="disconnectBot()" class="mt-4 w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition">
+                            <i class="fas fa-plug mr-2"></i>Putuskan Koneksi
+                        </button>
+                    </div>
+
+                    <!-- Connection Status -->
+                    <div class="card p-6">
+                        <h2 class="font-bold text-xl mb-4">Status Koneksi</h2>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center border-b pb-3">
+                                <span>Nama Perangkat</span>
+                                <span id="deviceName" class="font-semibold">-</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b pb-3">
+                                <span>Nomor WhatsApp</span>
+                                <span id="phoneNumber" class="font-semibold">-</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b pb-3">
+                                <span>Status</span>
+                                <span id="connectionStatus" class="status-online text-white px-3 py-1 rounded-full text-sm">Online</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b pb-3">
+                                <span>Terhubung Sejak</span>
+                                <span id="connectedSince" class="font-semibold">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groups Section -->
+            <div id="groupsSection" class="hidden">
+                <h1 class="text-3xl font-bold text-gray-800 mb-8">Grup Terjaga</h1>
+                
+                <div class="card p-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="border-b">
+                                <tr class="text-left text-gray-600">
+                                    <th class="pb-3">Nama Grup</th>
+                                    <th class="pb-3">ID Grup</th>
+                                    <th class="pb-3">Anggota</th>
+                                    <th class="pb-3">Status</th>
+                                    <th class="pb-3">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="groupsTable">
+                                <tr><td colspan="5" class="text-center py-4">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settingsSection" class="hidden">
+                <h1 class="text-3xl font-bold text-gray-800 mb-8">Pengaturan Bot</h1>
+                
+                <div class="grid gap-6">
+                    <!-- Anti Spam Settings -->
+                    <div class="card p-6">
+                        <h2 class="font-bold text-xl mb-4">🛡️ Anti Spam</h2>
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <p class="font-semibold">Aktifkan Anti Spam</p>
+                                <p class="text-gray-500 text-sm">Blokir pesan berulang/duplikat</p>
+                            </div>
+                            <div class="toggle-switch" id="antiSpamToggle" onclick="toggleSetting('antiSpam')"></div>
+                        </div>
+                        <div class="border-t pt-4 mt-2">
+                            <label class="block text-sm font-medium mb-2">Maksimal pesan per menit</label>
+                            <input type="number" id="maxMessagesPerMinute" class="border rounded-lg px-3 py-2 w-32" value="5">
+                        </div>
+                    </div>
+
+                    <!-- Anti Link Settings -->
+                    <div class="card p-6">
+                        <h2 class="font-bold text-xl mb-4">🔗 Anti Link</h2>
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <p class="font-semibold">Aktifkan Anti Link</p>
+                                <p class="text-gray-500 text-sm">Blokir pesan yang mengandung link</p>
+                            </div>
+                            <div class="toggle-switch" id="antiLinkToggle" onclick="toggleSetting('antiLink')"></div>
+                        </div>
+                        <div class="border-t pt-4 mt-2">
+                            <label class="block text-sm font-medium mb-2">Domain yang diizinkan (pisah dengan koma)</label>
+                            <input type="text" id="allowedDomains" class="w-full border rounded-lg px-3 py-2" placeholder="youtube.com,google.com">
+                        </div>
+                    </div>
+
+                    <!-- Anti Toxic Settings -->
+                    <div class="card p-6">
+                        <h2 class="font-bold text-xl mb-4">😤 Anti Toxic</h2>
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <p class="font-semibold">Aktifkan Anti Toxic</p>
+                                <p class="text-gray-500 text-sm">Filter kata kasar dan toxic</p>
+                            </div>
+                            <div class="toggle-switch" id="antiToxicToggle" onclick="toggleSetting('antiToxic')"></div>
+                        </div>
+                        <div class="border-t pt-4 mt-2">
+                            <label class="block text-sm font-medium mb-2">Kata-kata terlarang</label>
+                            <textarea id="bannedWords" rows="3" class="w-full border rounded-lg px-3 py-2" placeholder="kata1, kata2, kata3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Auto Reply Settings -->
+                    <div class="card p-6">
+                        <h2 class="font-bold text-xl mb-4">🤖 Auto Reply</h2>
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <p class="font-semibold">Aktifkan Auto Reply</p>
+                                <p class="text-gray-500 text-sm">Balas otomatis untuk kata kunci tertentu</p>
+                            </div>
+                            <div class="toggle-switch" id="autoReplyToggle" onclick="toggleSetting('autoReply')"></div>
+                        </div>
+                        <div class="border-t pt-4 mt-2">
+                            <div id="autoReplyList"></div>
+                            <button onclick="addAutoReply()" class="mt-2 bg-green-500 text-white px-4 py-2 rounded-lg text-sm">
+                                <i class="fas fa-plus mr-1"></i>Tambah Auto Reply
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Welcome Message -->
+                    <div class="card p-6">
+                        <h2 class="font-bold text-xl mb-4">👋 Welcome Message</h2>
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <p class="font-semibold">Aktifkan Welcome Message</p>
+                                <p class="text-gray-500 text-sm">Sambut anggota baru yang bergabung</p>
+                            </div>
+                            <div class="toggle-switch" id="welcomeMsgToggle" onclick="toggleSetting('welcomeMsg')"></div>
+                        </div>
+                        <div class="border-t pt-4 mt-2">
+                            <label class="block text-sm font-medium mb-2">Pesan Sambutan</label>
+                            <textarea id="welcomeMessage" rows="3" class="w-full border rounded-lg px-3 py-2" placeholder="Selamat datang {name} di grup {group}!">Selamat datang {name} di grup {group}! Semoga betah ya 😊</textarea>
+                        </div>
+                    </div>
+
+                    <button onclick="saveSettings()" class="bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition">
+                        <i class="fas fa-save mr-2"></i>Simpan Semua Pengaturan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Logs Section -->
+            <div id="logsSection" class="hidden">
+                <h1 class="text-3xl font-bold text-gray-800 mb-8">Log Aktivitas</h1>
+                
+                <div class="card p-6">
+                    <div class="mb-4 flex gap-4">
+                        <select id="logFilter" class="border rounded-lg px-4 py-2">
+                            <option value="all">Semua</option>
+                            <option value="spam">Spam Terblokir</option>
+                            <option value="link">Link Terblokir</option>
+                            <option value="toxic">Kata Toxic Terfilter</option>
+                            <option value="welcome">Welcome Message</option>
+                        </select>
+                        <button onclick="clearLogs()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                            <i class="fas fa-trash mr-1"></i>Hapus Semua Log
+                        </button>
+                    </div>
+                    <div id="logsList" class="space-y-2 max-h-96 overflow-y-auto">
+                        <!-- Logs akan muncul di sini -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>
